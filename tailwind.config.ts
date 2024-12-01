@@ -12,6 +12,10 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      backgroundImage: {
+        "custom-banner":
+          "url('https://smehealthcheck.credilinq.ai/static/images/header-bg.jpg')",
+      },
     },
   },
   plugins: [],
