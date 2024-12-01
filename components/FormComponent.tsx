@@ -11,7 +11,7 @@ import InputSection from "./InputSection";
 import { useEffect, useState } from "react";
 import { Check } from "@mui/icons-material";
 import DropZone from "./DropBox";
-import { useFormik } from "formik";
+import { FormikHelpers, useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { useRouter } from "next/navigation"; // Import useRouter
@@ -30,6 +30,7 @@ const PDF_DESCRIPTION = [
   "In case you are facing any issues while uploading bank statements, please contact us at support@credilinq.ai.",
 ];
 
+// Define the shape of form data
 interface FormData {
   companyUEN: string;
   companyName: string;
@@ -38,31 +39,38 @@ interface FormData {
   email: string;
   confirmEmail: string;
   mobileNo: string;
-  file: string;
+  file: File | null;
+}
+
+// Define the shape of the flag state
+interface FlagState {
+  company: boolean;
+  user: boolean;
+  file: boolean;
 }
 
 export default function FormComponent() {
-  const [checked, setChecked] = useState(false);
-  const [toastOpen, setToastOpen] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const [checked, setChecked] = useState<boolean>(false);
+  const [toastOpen, setToastOpen] = useState<boolean>(false);
+  const [toastMessage, setToastMessage] = useState<string>("");
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
   const router = useRouter(); // Initialize useRouter
 
   const [toastSeverity, setToastSeverity] = useState<
     "success" | "info" | "error"
   >("info");
 
-  const [flag, setFlag] = useState({
+  const [flag, setFlag] = useState<FlagState>({
     company: false,
     user: false,
     file: false,
   });
 
-  const handleFileAccepted = (files: object | string) => {
+  const handleFileAccepted = (files: File[]) => {
     console.log("Accepted files:", files);
   };
 
-  const validationSchema = Yup.object({
+  const validationSchema = Yup.object().shape({
     companyUEN: Yup.string()
       .matches(/^[A-Za-z0-9]{9,10}$/, "Invalid Company UEN")
       .required("Company UEN is required"),
@@ -78,7 +86,7 @@ export default function FormComponent() {
     mobileNo: Yup.string()
       .matches(/^[0-9]{8,10}$/, "Invalid Mobile Number")
       .required("Mobile Number is required"),
-    file: Yup.mixed().required("File upload is required"),
+    file: Yup.mixed<File>().required("File upload is required").nullable(),
   });
 
   const handleSubmit = async (data: FormData) => {
@@ -90,7 +98,7 @@ export default function FormComponent() {
         email: data.email,
         position: data.position,
         mobile: String(data.mobileNo),
-        file: data.file.name,
+        file: data.file?.name,
       };
 
       const response = await axios.post(`${apiUrl}/users`, userData);
@@ -104,14 +112,14 @@ export default function FormComponent() {
       }, 2000);
     } catch (error) {
       console.log(error);
-      setToastMessage("Failed to saved data");
+      setToastMessage("Failed to save data");
       setToastSeverity("error");
     } finally {
       setToastOpen(true);
     }
   };
 
-  const formik = useFormik({
+  const formik = useFormik<FormData>({
     initialValues: {
       companyUEN: "",
       companyName: "",
@@ -120,12 +128,13 @@ export default function FormComponent() {
       email: "",
       confirmEmail: "",
       mobileNo: "",
-      file: "",
+      file: null,
     },
     validationSchema,
-    onSubmit: (values) => {
+    onSubmit: (values, { resetForm }: FormikHelpers<FormData>) => {
       console.log("Form Submitted:", values);
       handleSubmit(values);
+      resetForm();
     },
   });
 
