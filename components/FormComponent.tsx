@@ -38,7 +38,7 @@ interface FormData {
   email: string;
   confirmEmail: string;
   mobileNo: string;
-  file: any;
+  file: string;
 }
 
 export default function FormComponent() {
@@ -58,7 +58,7 @@ export default function FormComponent() {
     file: false,
   });
 
-  const handleFileAccepted = (files: any) => {
+  const handleFileAccepted = (files: object | string) => {
     console.log("Accepted files:", files);
   };
 
@@ -73,7 +73,7 @@ export default function FormComponent() {
       .email("Invalid Email Address")
       .required("Email Address is required"),
     confirmEmail: Yup.string()
-      .oneOf([Yup.ref("email"), null], "Emails must match")
+      .oneOf([Yup.ref("email")], "Emails must match")
       .required("Re-enter Email Address is required"),
     mobileNo: Yup.string()
       .matches(/^[0-9]{8,10}$/, "Invalid Mobile Number")
@@ -120,7 +120,7 @@ export default function FormComponent() {
       email: "",
       confirmEmail: "",
       mobileNo: "",
-      file: null,
+      file: "",
     },
     validationSchema,
     onSubmit: (values) => {
@@ -141,6 +141,7 @@ export default function FormComponent() {
     } catch (error) {
       setToastMessage("Failed to connect to server");
       setToastSeverity("error");
+      console.log(error);
     } finally {
       setToastOpen(true);
     }

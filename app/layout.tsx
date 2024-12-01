@@ -3,7 +3,6 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import StyledEngineProvider from "@mui/material/StyledEngineProvider";
-import { Box } from "@mui/material";
 import { Header } from "@/components";
 import Footer from "@/components/Footer";
 
