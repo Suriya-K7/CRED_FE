@@ -163,6 +163,7 @@ export default function FormComponent() {
 
   useEffect(() => {
     serverConnect();
+    // eslint-disable-next-line
   }, []);
 
   return (

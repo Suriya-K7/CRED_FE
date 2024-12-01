@@ -1,7 +1,7 @@
 "use Client";
 import { FileUpload, Close } from "@mui/icons-material";
 import React, { useCallback, useState } from "react";
-import { useDropzone } from "react-dropzone";
+import { useDropzone, FileRejection } from "react-dropzone";
 
 interface DropZoneProps {
   onFileAccepted: (files: File[]) => void;
@@ -18,14 +18,12 @@ const DropZone: React.FC<DropZoneProps> = ({
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const onDrop = useCallback(
-    (acceptedFiles: File[], fileRejections: any[]) => {
+    (acceptedFiles: File[], fileRejections: FileRejection[]) => {
       const newFileList = [...selectedFiles, ...acceptedFiles];
       if (fileRejections.length > 0) {
         const errorMessages = fileRejections.map((rejection) => {
           const { file, errors } = rejection;
-          return `${file.name}: ${errors
-            .map((e: any) => e.message)
-            .join(", ")}`;
+          return `${file.name}: ${errors.map((e) => e.message).join(", ")}`;
         });
         setErrorMessage(errorMessages.join("\n"));
       } else if (newFileList.length > 6) {

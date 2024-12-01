@@ -53,6 +53,7 @@ export default function User() {
 
   useEffect(() => {
     fetchUserData();
+    // eslint-disable-next-line
   }, []);
 
   return (
